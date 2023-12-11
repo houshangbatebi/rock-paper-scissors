@@ -1,30 +1,46 @@
-function game() {
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Initialization
     let computerSelection
     let playerSelection
     let computerScore = 0
     let playerScore = 0
+    let gameOver = false;
+    let  roundCount = 0
+    const roundResult = document.querySelector('#round-result')
+    let roundAnnouncement
 
-    for (let i = 0; i < 5; i++) {
-        // Play a 5 round game
-        console.log(`Round ${i+1}: `)
+    // Listen to button click event and play a round. If the game is over, no new round of the game will be played.
+    const buttons = document.querySelectorAll('#buttons > button')
+    buttons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            if (!gameOver) {
+                computerSelection = getComputerChoice()
+                playerSelection = event.target.textContent.toLowerCase()
+                console.log(`Round ${++roundCount}:`)
+                console.log(`Computer choice is ${computerSelection}`)
+                console.log(`User choice is ${playerSelection}`)
+                // Play a round
+                roundAnnouncement = playRound(computerSelection, playerSelection)
+                console.log(roundAnnouncement)
+                roundResult.textContent = `Round ${roundCount}: Computer choice is ${computerSelection} and your choice is ${playerSelection}. ${roundAnnouncement}`
+                // Update the result on webpage
+                updateResultShow(roundAnnouncement)
+            } 
+        })
+    })
+    
 
-        playerSelection = getUserChoice()
-        console.log(`Player choice: ${playerSelection}`)
-        
-        computerSelection = getComputerChoice()
-        console.log(`Computer chice: ${computerSelection}`)
-        
-        console.log(playRound(computerSelection, playerSelection))
-        console.log(`Current Scores: Computer is ${computerScore} and Player is ${playerScore}`) 
+    function getComputerChoice() {
+        // This function will return computer choice
+        let randomNumber = Math.floor(Math.random() * 3)
+        if (randomNumber == 0) return 'rock'
+        else if (randomNumber == 1) return 'paper'
+        else return 'scissors'
     }
 
-    // Winner announcement
-    if (playerScore > computerScore) return `You Win!`
-    else if (computerScore > playerScore) return `You Lose!`
-    else return `Tie!`
-
     function playRound(computerSelection, playerSelection) {
-        // This function plays a single round of Rock Paper Scissors game
+        // This function plays a single round of Rock Paper Scissors game and updates score variables
         if (computerSelection === 'rock') {
             if (playerSelection === 'paper') {
                 playerScore++
@@ -62,23 +78,48 @@ function game() {
             else return 'Tie'
         }
     }
-}
-
-function getComputerChoice() {
-    // This function will return computer choice
-    let randomNumber = Math.floor(Math.random() * 3)
-    if (randomNumber == 0) return 'rock'
-    else if (randomNumber == 1) return 'paper'
-    else return 'scissors'
-}
 
 
-function getUserChoice() {
-    // This function will get user choice. if the input is not valid, it will repeat
-    let playerSelection
-    do {
-        playerSelection = prompt('What is your choice? (please only choose between rock, paper and scissors)').toLowerCase()
-    } while (!(playerSelection === 'rock' || playerSelection === 'paper' || playerSelection === 'scissors'))
-    return playerSelection
-}
+    function updateResultShow(){
+        // This function updates the Result section on webpage
+        document.querySelector('#user-score').textContent = playerScore
+        document.querySelector('#computer-score').textContent = computerScore
+        if (playerScore === 5) {
+            gameOver = true;
+            endGame('Win!')
+        }
+        else if (computerScore === 5) {
+            gameOver = true;
+            endGame('Lose!')
+        }
+    }
+
+    function endGame(finalResult) {
+        // Announce the winner and show the reset button!
+        const resultContainer = document.querySelector('#result')
+        const announcement = document.createElement('h3')
+        announcement.textContent =  `You ${finalResult}`
+        resultContainer.appendChild(announcement)
+
+        // Show 'Play Again' button
+        const resetButton = document.createElement('button')
+        resetButton.textContent = 'Play Again!'
+        resultContainer.appendChild(resetButton)
+        // When the button is clicked, reset the game.
+        resetButton.addEventListener('click', () => {
+            // Initialization
+            playerScore = 0
+            computerScore = 0
+            gameOver = false
+            roundCount = 0
+            roundResult.textContent = ''
+            console.warn('Resetting the game...')
+            // Remove the last announcement and reset button
+            resultContainer.removeChild(announcement)
+            resultContainer.removeChild(resetButton)
+            // Update the scores on webpage
+            updateResultShow()
+        })
+    }
+})
 

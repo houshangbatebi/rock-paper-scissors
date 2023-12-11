@@ -1,2 +1,2 @@
 # rock-paper-scissors
-To play the game, invoke game() function in browser console. The game has 5 round.
+If one side's score reaches 5 first, that side is the winner. In each round of the game, the computer's choice and your choice will be printed on the screen as well as the browser console. After finishing the game, you can click the "Play Again" button to start the game again. 
